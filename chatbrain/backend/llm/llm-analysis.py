@@ -148,7 +148,7 @@ if __name__ == "__main__":
     def get_string_from_file(file_path):
         with open(file_path, 'r') as file:
             return file.read()
-    jsonOutput, response = promptToJSON(get_string_from_file("../../data/small.txt"), 1500, model_name, "Joey", "Norma", "J", "N")
+    jsonOutput, response = promptToJSON(get_string_from_file("../data/shrink_test_output.txt"), 1500, model_name, "Joey", "Norma", "J", "N")
     #save the ChatCompletion object to a file
     with open("chat_completion.json", "w") as f:
         f.write(str(response))
