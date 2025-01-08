@@ -1,0 +1,7 @@
+move out directory to its own project folder
+frontend
+api
+backend
+hosting
+deploying?
+ads?
