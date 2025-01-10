@@ -2,6 +2,9 @@ move out directory to its own project folder
 frontend
 api
 backend
+    price and usage reports
+    confirm after showing message number before sending to api
+    pattern matching to extract names
 hosting
 deploying?
 ads?
