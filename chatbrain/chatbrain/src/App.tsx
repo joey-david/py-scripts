@@ -1,20 +1,21 @@
-import { useState } from 'react'
-import { Hero } from './components/ui/animated-hero'
+// filepath: /home/joey/Projects/py-scripts/chatbrain/chatbrain/src/App.tsx
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { Home } from './components/pages/home'
+import { Header } from './components/header'
 import { Footer } from './components/footer'
-import ChatbrainLogo from "./components/ChatbrainLogo"
+import { Analysis } from './components/pages/analysis'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <h1 className="flex items-center justify-center gap-2"><ChatbrainLogo className="gap-6"/> chatbrain </h1>
-      <div className="animated-hero">
-        <Hero />
-      </div>
+    <Router>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/analysis" element={<Analysis />} />
+      </Routes>
       <Footer />
-    </>
+    </Router>
   )
 }
 

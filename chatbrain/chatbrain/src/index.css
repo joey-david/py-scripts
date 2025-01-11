@@ -18,6 +18,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  
+}
+
+#root {
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  width: 100%; /* Ensure the root takes the full width */
+  height: 100%; /* Ensure the root takes the full height */
 }
 
 a {
@@ -30,6 +40,7 @@ a:hover {
 }
 
 body {
+  background-color: #d4d6ff;
   margin: 0;
   display: flex;
   place-items: center;

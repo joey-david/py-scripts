@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { FileCode, Brain, PhoneCall, ImageIcon, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-function Hero() {
+function Home() {
   const [titleNumber, setTitleNumber] = useState(0);
   const titles = useMemo(
     () => [
@@ -57,7 +57,7 @@ function Hero() {
             <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-3xl text-center">
               Get a truly impartial outlook on your conversations, no matter the platform.<br></br>
               Receive a grading on a variety of conversational metrics, and see how you can improve.<br></br>
-              This platform is fully <a href="https://github.com" className="font-bold underline text-indigo-300">open-source</a> and stores none of your data past the session.
+              chatbrain is fully <a href="https://github.com" className="font-bold underline text-indigo-450">open-source</a> and stores none of your data beyond the session.
             </p>
           </div>
           <div className="flex flex-row gap-3">
@@ -70,7 +70,7 @@ function Hero() {
                 View the code <FileCode className="h-6 w-6" />
               </Button>
             </a>
-            <a href="/start-analysis" className="inline-block">
+            <a href="/analysis" className="inline-block">
               <Button size="lg" className="gap-4 w-full text-base">
                 Start a free analysis <Brain className="h-6 w-6" />
               </Button>
@@ -82,4 +82,4 @@ function Hero() {
   );
 }
 
-export { Hero };
+export { Home };

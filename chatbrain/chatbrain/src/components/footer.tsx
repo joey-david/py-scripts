@@ -10,7 +10,7 @@ function Footer() {
     ]
 
     return (
-        <footer className="border-t mt-16 py-6 text-center text-muted-foreground tracking-tight">
+        <footer className="mt-16 py-6 text-center text-muted-foreground tracking-tight">
             <p className="text-base md:text-lg mb-4 font-medium tracking-wide">
                 {currentYear}{' | '}
                 <a
@@ -19,7 +19,7 @@ function Footer() {
                     rel="noopener noreferrer"
                     className="text-foreground hover:underline transition-all"
                 >
-                    ChatBrain 
+                    chatbrain 
                 </a>
                 {' '}is built with 
             </p>
