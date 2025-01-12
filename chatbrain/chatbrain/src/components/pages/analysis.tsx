@@ -1,64 +1,105 @@
+import { useState, useRef } from 'react'
 import { EmptyState } from "@/components/empty-state"
 import { Results } from "@/components/results"
 import { FeaturesSectionWithHoverEffects } from "@/components/input-selection"
 import { PhoneCall, Image, Mic } from "lucide-react"
 
+interface AnalysisResults {
+  data: any;
+  timestamp: string;
+  conversation_metrics: any; // Replace 'any' with the appropriate type
+  users: any; // Replace 'any' with the appropriate type
+  insights: any; // Replace 'any' with the appropriate type
+}
+
 function Analysis() {
+  // State management
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Handle file selection
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.length) return
+
+    const selectedFiles = Array.from(event.target.files)
+    
+    // Check if files are all the same type
+    const fileType = selectedFiles[0]?.type
+    const allSameType = selectedFiles.every(file => file.type === fileType)
+    
+    if (!allSameType) {
+      alert("All files must be of the same type")
+      return
+    }
+
+    await uploadAndAnalyze(selectedFiles)
+  }
+
+  // Handle upload button click
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  // Upload and analyze files
+  const uploadAndAnalyze = async (files: File[]) => {
+    setIsLoading(true)
+    
+    try {
+      const formData = new FormData()
+      files.forEach(file => {
+        formData.append('files', file)
+      })
+
+      const response = await fetch('http://chatbrain/api/routes/fileCategorization.py', {
+        method: 'POST',
+        body: formData
+      })
+
+      const results = await response.json()
+      setAnalysisResults(results)
+    } catch (error) {
+      console.error('Error uploading files:', error)
+      alert('An error occurred while uploading files. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <main className="min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-6">Analysis</h1>
-      <FeaturesSectionWithHoverEffects />
+      {/* <FeaturesSectionWithHoverEffects /> */}
+      
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        multiple
+        onChange={handleFileSelect}
+      />
+
       <EmptyState
         className=""
         title="No Files Uploaded"
         description="Please upload an exported whatsapp chat, a set of screenshots or an audio recording of your vocal messages."
-        icons={[Image, PhoneCall, Mic]} // optional set of icons
+        icons={[Image, PhoneCall, Mic]}
         action={{
           label: "Upload file(s)",
-          onClick: () => {
-            // handle file upload
-          },
+          onClick: handleUploadClick,
         }}
       />
-      < Results data = {
-        {
-          conversation_metrics: {
-            stability_score_out_of_100: 80,
-            health_score_out_of_100: 60,
-            intensity_score_out_of_100: 40
-          },
-          users: {
-            "Alice": {
-              assertiveness: 70,
-              positiveness: 90,
-              affection_towards_other: 80,
-              romantic_attraction_towards_other: 10,
-              rationality: 60,
-              emotiveness: 70,
-              IQ_estimate: 120
-            },
-            "Bob": {
-              assertiveness: 30,
-              positiveness: 40,
-              affection_towards_other: 50,
-              romantic_attraction_towards_other: 70,
-              rationality: 80,
-              emotiveness: 30,
-              IQ_estimate: 110
-            }
-          },
-          insights: [
-            "Alice is more assertive than Bob",
-            "Bob is more rational than Alice"          ]
-        }
-      }
-      />
-      <section className="mt-8 text-center">
-        <h2 className="text-xl font-semibold">Analysis Results</h2>
-        <p className="text-sm text-muted-foreground mt-2">
-          This section will display your results once files have been analyzed.
-        </p>
-      </section>
+
+      {/* Loading and Results Section */}
+      <div className="w-full max-w-3xl mt-8">
+        {isLoading && (
+          <div className="flex justify-center items-center p-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+          </div>
+        )}
+        {!isLoading && analysisResults && (
+          <Results data={analysisResults} />
+        )}
+      </div>
     </main>
   )
 }

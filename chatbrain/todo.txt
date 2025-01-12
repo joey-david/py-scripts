@@ -1,7 +1,11 @@
 move out directory to its own project folder
 frontend
 api
+    compile py functions
+    link to api
+    link frontend to api
 backend
+    vision model to crop messages from images with metadata
     price and usage reports
     confirm after showing message number before sending to api
     pattern matching to extract names
