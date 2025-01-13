@@ -103,27 +103,31 @@ def promptToJSON(prompt, maxOutputTokens, model_name, users, nicknames):
     return None
 
   # print result data
-  print(f"API call price: ${calculate_api_cost(response):.8f} USD")
-  print(f"Total tokens used: {response.usage.total_tokens}")
-  print(f"Prompt cached tokens: {response.usage.prompt_cache_hit_tokens}")
-  print(f"Prompt uncached tokens: {response.usage.prompt_cache_miss_tokens}")
-  print(f"Completion tokens: {response.usage.completion_tokens}")
-  print(f"--------------------\n")
-  print("JSON output:")
+  # print(f"API call price: ${calculate_api_cost(response):.8f} USD")
+  # print(f"Total tokens used: {response.usage.total_tokens}")
+  # print(f"Prompt cached tokens: {response.usage.prompt_cache_hit_tokens}")
+  # print(f"Prompt uncached tokens: {response.usage.prompt_cache_miss_tokens}")
+  # print(f"Completion tokens: {response.usage.completion_tokens}")
+  # print(f"--------------------\n")
+  # print("JSON output:")
+  
   jsonOutput = response.choices[0].message.content
   print(jsonOutput)
   return jsonOutput, response
 
 def api_call (model, maxOutputTokens=2000, systemPrompt=None, userPrompt=None):
-  response = client.chat.completions.create(
-    model=model,
-    messages=[
-      {"role": "system", "content": systemPrompt},
-      {"role": "user", "content": userPrompt}
-    ],
-    max_tokens=maxOutputTokens,
-    response_format={'type': 'json_object'}
-  )
+  # TODO: reimplement standard api call
+  # response = client.chat.completions.create(
+  #   model=model,
+  #   messages=[
+  #     {"role": "system", "content": systemPrompt},
+  #     {"role": "user", "content": userPrompt}
+  #   ],
+  #   max_tokens=maxOutputTokens,
+  #   response_format={'type': 'json_object'}
+  # )
+
+  response = jsonifiy("./chat_completion.json")
   return response
 
 def llm_analysis(file_path: str, users: list, nicknames: list):

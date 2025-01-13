@@ -51,7 +51,7 @@ function Analysis() {
         formData.append('files', file)
       })
 
-      const response = await fetch('http://chatbrain/api/routes/fileCategorization.py', {
+      const response = await fetch('http://chatbrain/api/files.py', {
         method: 'POST',
         body: formData
       })
