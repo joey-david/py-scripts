@@ -2,10 +2,11 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import deepseek_v2_tokenizer as dtok
+import pickle
 
 load_dotenv()  # Load environment variables from .env file
-model_name = os.getenv("MODEL_NAME")
-base_url = os.getenv("BASE_URL")
+model_name = "deepseek-ai/DeepSeek-V3"
+base_url = "https://api.deepseek.com"
 
 # usage stats : https://platform.deepseek.com/usage
 client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url=base_url)
@@ -83,15 +84,14 @@ def getSystemPrompt(users, nicknames):
     }}
   """
 
-def promptToJSON(prompt, maxOutputTokens, model_name, users, nicknames):
+def promptToJSON(prompt, maxOutputTokens, users, nicknames, model_name="deepseek-ai/DeepSeek-V3"):
   # build the system prompt
   systemPrompt = getSystemPrompt(users, nicknames)
 
   #check for outsanding prices, get general token information
   price, tokenCount = dtok.apiCallPrice(prompt + systemPrompt, maxOutputTokens, model_name)
   if price > 0.001:
-    print(f"Warning: This API call will cost ${price:.2f} USD.")
-    return None
+    print(f"Warning: This API call will cost ${price:.4f} USD.")
   print(f"Token count: {tokenCount}")
   print(f"Calculated API call price: ${price:.8f} USD")
 
@@ -112,10 +112,9 @@ def promptToJSON(prompt, maxOutputTokens, model_name, users, nicknames):
   # print("JSON output:")
   
   jsonOutput = response.choices[0].message.content
-  print(jsonOutput)
   return jsonOutput, response
 
-def api_call (model, maxOutputTokens=2000, systemPrompt=None, userPrompt=None):
+def api_call(model, maxOutputTokens=2000, systemPrompt=None, userPrompt=None):
   # TODO: reimplement standard api call
   # response = client.chat.completions.create(
   #   model=model,
@@ -126,9 +125,15 @@ def api_call (model, maxOutputTokens=2000, systemPrompt=None, userPrompt=None):
   #   max_tokens=maxOutputTokens,
   #   response_format={'type': 'json_object'}
   # )
+  # # pickle the response object
+  # with open("chat_completion.pkl", "wb") as f:
+  #   pickle.dump(response, f)
 
-  response = jsonifiy("./chat_completion.json")
-  return response
+  # extract the response object from the pickle file
+  with open("chat_completion.pkl", "rb") as f:
+    response = pickle.load(f)
+
+  return (response)
 
 def llm_analysis(file_path: str, users: list, nicknames: list):
   return None
@@ -137,7 +142,7 @@ if __name__ == "__main__":
   def get_string_from_file(file_path):
     with open(file_path, 'r') as file:
       return file.read()
-  jsonOutput, response = promptToJSON(get_string_from_file("./data/shrink_test_output.txt"), 1500, model_name, ["Joey", "Norma", "Henri"], ["J", "N", "H"])
+  jsonOutput, response = promptToJSON(get_string_from_file("./data/shrink_test_output.txt"), 1500, ["Joey", "Norma", "Henri"], ["J", "N", "H"])
   #save the ChatCompletion object to a file
   with open("chat_completion.json", "w") as f:
     f.write(str(response))

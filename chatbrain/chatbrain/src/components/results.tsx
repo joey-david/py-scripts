@@ -84,7 +84,7 @@ export function Results({ data }: { data: ResultsData }) {
   const { conversation_metrics, users, insights } = data;
 
   return (
-    <Card className="w-full max-w-5xl mx-auto space-y-8 p-6 mt-10 bg-card/50">
+    <Card className="w-full max-w-5xl mx-auto space-y-8 p-6 mt-10 bg-card/0 transition duration-300 ease-in-out">
       {/* Conversation Metrics */}
       <Card className="bg-card/40">
         <div className="p-6">

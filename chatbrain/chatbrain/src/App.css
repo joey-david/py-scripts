@@ -1,7 +1,29 @@
+/* filepath: /home/joey/Projects/py-scripts/chatbrain/chatbrain/src/App.css */
 #root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0 auto;
+  padding: 0;
+}
+
+header {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+main {
+  flex-grow: 1;
   padding: 2rem;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+footer {
+  flex-shrink: 0;
+  width: 100%;
 }
 
 .logo {

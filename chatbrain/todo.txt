@@ -1,9 +1,8 @@
 move out directory to its own project folder
 frontend
+    refactor code, especially analysis.tsx
 api
-    compile py functions
-    link to api
-    link frontend to api
+    implement voice and image
 backend
     vision model to crop messages from images with metadata
     price and usage reports

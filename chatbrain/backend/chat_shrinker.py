@@ -44,7 +44,7 @@ def parse_datetime(date_str, time_str):
         return dt
     return None
 
-def shrink_chat(input_file, start_date=None, end_date=None, start_time=None, end_time=None, output_file=None):
+def shrink_chat(file, start_date=None, end_date=None, start_time=None, end_time=None, output_file=None):
     """
     Compacts a chat log file by removing messages outside a specified date and time range.
     Detects all user names from the chat and assigns unique nicknames automatically.
@@ -56,7 +56,6 @@ def shrink_chat(input_file, start_date=None, end_date=None, start_time=None, end
             if candidate not in used:
                 return candidate
             i += 1
-        # fallback if entire name is taken
         idx = 2
         candidate = name
         while candidate in used:
@@ -72,8 +71,7 @@ def shrink_chat(input_file, start_date=None, end_date=None, start_time=None, end
     start_datetime = parse_datetime(start_date, start_time)
     end_datetime = parse_datetime(end_date, end_time)
 
-    with open(input_file, "r", encoding="utf-8") as fin:
-        messages = fin.readlines()
+    messages = file.read().decode('utf-8').splitlines()
 
     start_index = search_start(messages, start_datetime) if start_datetime else 0
     msgCount = 0
@@ -127,34 +125,42 @@ def shrink_chat(input_file, start_date=None, end_date=None, start_time=None, end
     return result_str, msgCount, n_users, names, usernames
 
 if __name__ == "__main__":
-    def get_file_path():
-        root = tk.Tk()
-        root.withdraw()
-        return filedialog.askopenfilename(title="Select the chat file")
-
     def get_user_input(prompt):
         root = tk.Tk()
         root.withdraw()
         return simpledialog.askstring("Input", prompt)
 
-    input_file = get_file_path()
-    # user1_name = get_user_input("Enter the first user's name:")
-    # user2_name = get_user_input("Enter the second user's name:")
-    # user1_nickname = get_user_input("Enter the first user's nickname:")
-    # user2_nickname = get_user_input("Enter the second user's nickname:")
-    # start_date = get_user_input("Enter the start date (MM/DD/YYYY) (optional):")
-    # end_date = get_user_input("Enter the end date (MM/DD/YYYY) (optional):")
-    # start_time = get_user_input("Enter the start time (HH:MM AM/PM) (optional):")
-    # end_time = get_user_input("Enter the end time (HH:MM AM/PM) (optional):")
+    # Example usage with a file from a POST request
+    # from flask import Flask, request
 
-    output_file = "./data/shrink_test_output.txt"
-    start_date = "12/28/2024"
-    end_date = "12/29/2024"
-    start_time = "12:00 AM"
-    end_time = "11:59 PM"
-    string_test, msgCount, n_users, user_list, nickname_list = shrink_chat(
-        input_file, start_date, end_date, start_time, end_time, output_file)
-    print(f"Messsages: {msgCount}")
-    print(f"Number of users: {n_users}")
-    print(f"Users: {user_list}")
-    print(f"Nicknames: {nickname_list}")
+    # app = Flask(__name__)
+
+    # @app.route('/shrink', methods=['POST'])
+    # def shrink():
+    #     uploaded_file = request.files.get('file')
+    #     if not uploaded_file:
+    #         return "No file uploaded", 400
+    #     start_date = request.form.get('start_date')
+    #     end_date = request.form.get('end_date')
+    #     start_time = request.form.get('start_time')
+    #     end_time = request.form.get('end_time')
+    #     output, count, users, names, nicknames = shrink_chat(
+    #         uploaded_file, start_date, end_date, start_time, end_time)
+    #     return output
+
+    # app.run()
+    
+    # For local testing
+    input_file_path = filedialog.askopenfilename(title="Select the chat file")
+    with open(input_file_path, "rb") as f:
+        start_date = "12/28/2024"
+        end_date = "12/29/2024"
+        start_time = "12:00 AM"
+        end_time = "11:59 PM"
+        output_file = "./data/shrink_test_output.txt"
+        string_test, msgCount, n_users, user_list, nickname_list = shrink_chat(
+            f, start_date, end_date, start_time, end_time, output_file)
+        print(f"Messages: {msgCount}")
+        print(f"Number of users: {n_users}")
+        print(f"Users: {user_list}")
+        print(f"Nicknames: {nickname_list}")

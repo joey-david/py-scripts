@@ -19,7 +19,7 @@ def tokenList(text, chat_tokenizer_dir):
 def apiCallPrice(text, outputSize, chat_tokenizer_dir, imageCount=0, imageSizes=[]):
         """Returns the price of an API call to `deepseek-ai/DeepSeek-V3` for `text`, given a specific `outputSize`."""
         # assuming deepseek-ai/DeepSeek-V3 usage
-        price_per_M_tokens = 0.1 # in USD
+        price_per_M_tokens = 0.14 # in USD
         tokens = tokenCount(text, chat_tokenizer_dir) + outputSize
         return tokens * price_per_M_tokens / 1e6, tokenCount(text, chat_tokenizer_dir)
 
