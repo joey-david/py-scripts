@@ -1,6 +1,7 @@
 move out directory to its own project folder
 frontend
     refactor code, especially analysis.tsx
+    fix name display on analysis (instead of nicknames)
 api
     implement voice and image
 backend

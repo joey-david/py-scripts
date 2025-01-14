@@ -73,6 +73,6 @@ footer {
   backdrop-filter: blur(8px);
 }
 
-* {
+header, main, footer {
   transition: all 0.5s ease-out;
 }
