@@ -75,7 +75,7 @@ const ScoreRow = ({ label, value }: { label: string; value: number }) => (
 );
 
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-card text-card-foreground rounded-2xl shadow-sm border ${className}`}>
+  <div className={`bg-card text-card-foreground rounded-2xl shadow-sm ${className || ""}`}>
     {children}
   </div>
 );
@@ -86,51 +86,56 @@ export function Results({ data }: { data: ResultsData }) {
   return (
     <Card className="w-full max-w-5xl mx-auto space-y-8 p-6 mt-10 bg-card/0 transition duration-300 ease-in-out">
       {/* Conversation Metrics */}
-      <Card className="bg-card/40">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-6">Conversation Metrics</h2>
-          <ScoreRow label="Stability" value={conversation_metrics.stability_score_out_of_100} />
-          <ScoreRow label="Health" value={conversation_metrics.health_score_out_of_100} />
-          <ScoreRow label="Intensity" value={conversation_metrics.intensity_score_out_of_100} />
-        </div>
+      <Card className="bg-card/40 border-2">
+      <div className="p-6">
+        <h2 className="text-xl font-bold mb-6">Conversation Metrics</h2>
+        <ScoreRow label="Stability" value={conversation_metrics.stability_score_out_of_100} />
+        <ScoreRow label="Health" value={conversation_metrics.health_score_out_of_100} />
+        <ScoreRow label="Intensity" value={conversation_metrics.intensity_score_out_of_100} />
+      </div>
       </Card>
 
       {/* User Metrics */}
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(Object.keys(users).length, 3)} gap-6 bg-muted/0 border-border text-center`}>
-        {Object.entries(users).map(([username, metrics]) => (
-          <Card key={username} className="bg-card/40">
-            <div className="p-6">
-              <h3 className="text-lg font-bold mb-6">{username}</h3>
-              <div className="space-y-4">
-                <ScoreRow label="Assertiveness" value={metrics.assertiveness} />
-                <ScoreRow label="Positiveness" value={metrics.positiveness} />
-                <ScoreRow label="Affection" value={metrics.affection_towards_other} />
-                <ScoreRow label="Rom. Attraction" value={metrics.romantic_attraction_towards_other} />
-                <ScoreRow label="Rationality" value={metrics.rationality} />
-                <ScoreRow label="Emotiveness" value={metrics.emotiveness} />
-                <ScoreRow label="IQ Estimate" value={metrics.IQ_estimate} />
-              </div>
-            </div>
-          </Card>
-        ))}
+      {Object.entries(users).map(([username, metrics]) => (
+        <Card key={username} className="bg-card/40 border-2">
+        <div className="p-6">
+          <h3 className="text-lg font-bold mb-6">{username}</h3>
+          <div className="space-y-4">
+          <ScoreRow label="Assertiveness" value={metrics.assertiveness} />
+          <ScoreRow label="Positiveness" value={metrics.positiveness} />
+          <ScoreRow label="Affection" value={metrics.affection_towards_other} />
+          <ScoreRow label="Rom. Attraction" value={metrics.romantic_attraction_towards_other} />
+          <ScoreRow label="Rationality" value={metrics.rationality} />
+          <ScoreRow label="Emotiveness" value={metrics.emotiveness} />
+          <ScoreRow label="IQ Estimate" value={metrics.IQ_estimate} />
+          </div>
+        </div>
+        </Card>
+      ))}
       </div>
 
       {/* Insights */}
-      <Card className="bg-card/40">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-6">Insights</h2>
-          <div className="space-y-4">
-            {insights.map((insight, idx) => (
-              <div 
-                key={idx} 
-                className="p-4 rounded-lg text-secondary-foreground"
-              >
-                {insight}
-              </div>
-            ))}
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      {insights.slice(0, 2).map((insight, idx) => (
+        <Card key={idx} className="bg-card/40 border-2">
+        <div className="p-6 rounded-lg text-secondary-foreground text-justify">
+          <h3 className="text-lg font-bold mb-4 text-center">Insight {idx + 1}</h3>
+          {insight}
         </div>
-      </Card>
+        </Card>
+      ))}
+      </div>
+      {insights.length > 2 && (
+      <div className="grid grid-cols-1 gap-6 mt-6">
+        <Card className="bg-card/40 border-2">
+        <div className="p-6 rounded-lg text-secondary-foreground text-justify">
+          <h3 className="text-lg font-bold mb-4 text-center">Insight 3</h3>
+          {insights[2]}
+        </div>
+        </Card>
+      </div>
+      )}
     </Card>
   );
 }

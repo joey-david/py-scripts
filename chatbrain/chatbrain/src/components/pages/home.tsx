@@ -55,7 +55,7 @@ function Home() {
       <p className="text-slate-300 md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-5xl mx-auto">
         Get a truly impartial outlook on your conversations, no matter the platform.<br></br>
         Receive a grading on a variety of conversational metrics, and see how you can improve.<br></br>
-        chatbrain is fully <a href="https://github.com" className="font-bold underline text-indigo-300">open-source</a> and stores none of your data beyond the session.
+        chatbrain is fully <a href="https://github.com/joey-david/py-scripts/tree/main/chatbrain" className="font-bold underline text-indigo-300">open-source</a> and stores none of your data beyond the session.
       </p>
       </div>
       <div className="flex gap-3">

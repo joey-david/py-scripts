@@ -13,23 +13,32 @@ interface AnalysisResults {
 }
 
 function Analysis() {
-  // State management
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [analysisResults, setAnalysisResults] = useState(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [fileType, setFileType] = useState<'txt' | 'img' | 'aud' | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Handle file selection
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files?.length) return
-
-    const selectedFiles = Array.from(event.target.files)
-        
-    await uploadAndAnalyze(selectedFiles)
-  }
-
-  // Handle upload button click
   const handleUploadClick = () => {
     fileInputRef.current?.click()
+  }
+
+  const determineFileType = (file: File) => {
+    if (file.type.startsWith('text') || file.name.endsWith('.txt')) return 'txt'
+    if (file.type.startsWith('image')) return 'img'
+    if (file.type.startsWith('audio')) return 'aud'
+    return null
+  }
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files?.length) return
+
+    const selectedFiles = Array.from(files)
+    setSelectedFiles(selectedFiles)
+    setFileType(determineFileType(selectedFiles[0]))
+    
+    await uploadAndAnalyze(selectedFiles)
   }
 
   // Upload and analyze files
@@ -111,12 +120,11 @@ function Analysis() {
     return classes.filter(Boolean).join(' ')
   }
   return (
-    <main className="min-h-screen p-8 flex flex-col items-center">
+    <main className="p-8 flex flex-col items-center">
       {/* <FeaturesSectionWithHoverEffects /> */}
       <div className={cn(
-            "bg-muted/60 border-border hover:bg-muted/75 text-center",
-            "border-2 border-dashed rounded-xl p-14",
-            "group transition duration-300 ease-in-out hover:duration-200",
+            "bg-muted/60 border-border text-center",
+            "border-2 rounded-xl p-14",
             "justify-center items-center flex flex-col",
           )}>
         <input
@@ -128,17 +136,19 @@ function Analysis() {
         />
           <EmptyState
             className=""
-            title="No Files Uploaded"
-            description="Please upload an exported whatsapp chat, a set of screenshots or an audio recording of your vocal messages."
+            title={selectedFiles.length ? `Selected: ${selectedFiles[0].name}` : "No Files Uploaded"}
+            description={selectedFiles.length 
+              ? `${selectedFiles.length} file(s) selected - ${fileType?.toUpperCase() || 'Unknown'} type`
+              : "Please upload an exported whatsapp chat, a set of screenshots or an audio recording of your vocal messages."}
             icons={[Image, PhoneCall, Mic]}
             action={{
-              label: "Upload file(s)",
+              label: selectedFiles.length ? "Change files" : "Upload file(s)",
               onClick: handleUploadClick,
             }}
-          />
+        />
 
           {/* Loading and Results Section */}
-          <div className="w-full max-w-3xl mt-8">
+          <div className="w-full max-w-3xl">
             {isLoading && (
               <div className="flex justify-center items-center p-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />

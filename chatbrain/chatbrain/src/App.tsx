@@ -15,15 +15,17 @@ const GradientBackground = () => {
 
     switch (location.pathname) {
       case '/':
-        gradientRef.current.style.setProperty('--size', '30rem')
-        gradientRef.current.style.setProperty('--speed', '20s')
+        gradientRef.current.style.setProperty('--size', '25rem')
+        gradientRef.current.style.setProperty('--speed', '15s')
         break
       case '/analysis':
-        gradientRef.current.style.setProperty('--size', '50rem')
-        gradientRef.current.style.setProperty('--speed', '40s')
+        gradientRef.current.style.setProperty('--size', '65rem')
+        gradientRef.current.style.setProperty('--speed', '30s')
+        gradientRef.current.style.setProperty('left', '0rem')
         break
       default:
         gradientRef.current.style.setProperty('--size', '70rem')
+
         break
     }
   }, [location])

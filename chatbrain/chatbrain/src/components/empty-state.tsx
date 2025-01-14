@@ -23,9 +23,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className={cn(
-      "bg-muted/60 border-border hover:bg-muted/75 text-center",
-      "border-2 border-dashed rounded-xl p-14 w-full max-w-[620px]",
-      "group transition duration-500 hover:duration-200",
+      "bg-muted/0 border-border text-center",
+      "border-2 border-dashed rounded-xl p-14 w-full w-[550px]",
+      "group transition duration-300 ease-in-out hover:duration-200",
       className
     )}>
       <div className="flex justify-center isolate">
@@ -48,7 +48,7 @@ export function EmptyState({
             </div>
           </>
         ) : (
-          <div className="bg-background size-12 grid place-items-center rounded-xl shadow-lg ring-1 ring-border group-hover:-translate-y-0.5 transition duration-500 group-hover:duration-200">
+          <div className="bg-background size-12 grid place-items-center rounded-xl shadow-lg ring-1 ring-border hover:-translate-y-0.5 transition duration-500 group-hover:duration-200">
             {icons[0] && React.createElement(icons[0], {
               className: "w-6 h-6 text-muted-foreground"
             })}
@@ -63,7 +63,7 @@ export function EmptyState({
           variant="outline"
           className={cn(
             "mt-4",
-            "shadow-sm active:shadow-none"
+            "shadow-sm active:shadow-none text-black"
           )}
         >
           {action.label}
