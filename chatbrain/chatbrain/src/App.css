@@ -48,7 +48,7 @@
 
 @media (min-width: 40px) {
   .gradient {
-    --size: 32vh;
+    --size: 32rem;
   }
 }
 
