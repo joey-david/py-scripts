@@ -148,16 +148,16 @@ function Analysis() {
         />
 
           {/* Loading and Results Section */}
-          <div className="w-full max-w-3xl">
+            <div className="max-w-5xl mt-6 w-full">
             {isLoading && (
-              <div className="flex justify-center items-center p-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+              <div className="flex justify-center items-center p-8 py-1">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
               </div>
             )}
             {!isLoading && analysisResults && (
               <Results data={analysisResults} />
             )}
-          </div>
+            </div>
       </div>
     </main>
   )

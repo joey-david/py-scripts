@@ -84,16 +84,18 @@ export function Results({ data }: { data: ResultsData }) {
   const { conversation_metrics, users, insights } = data;
 
   return (
-    <Card className="w-full max-w-5xl mx-auto space-y-8 p-6 mt-10 bg-card/0 transition duration-300 ease-in-out">
+    <Card className="w-full max-w-5xl mx-auto space-y-8  mt-6 bg-card/0 transition duration-300 ease-in-out">
       {/* Conversation Metrics */}
-      <Card className="bg-card/40 border-2">
-      <div className="p-6">
+      <div className="flex justify-center w-full">
+        <Card className="bg-card/40 border-2 w-full max-w-xl">
+          <div className="p-6">
         <h2 className="text-xl font-bold mb-6">Conversation Metrics</h2>
         <ScoreRow label="Stability" value={conversation_metrics.stability_score_out_of_100} />
         <ScoreRow label="Health" value={conversation_metrics.health_score_out_of_100} />
         <ScoreRow label="Intensity" value={conversation_metrics.intensity_score_out_of_100} />
+          </div>
+        </Card>
       </div>
-      </Card>
 
       {/* User Metrics */}
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(Object.keys(users).length, 3)} gap-6 bg-muted/0 border-border text-center`}>
