@@ -8,7 +8,7 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   return (
-    <header className="flex items-center justify-between px-12 py-8">
+    <header className="flex items-center justify-between px-12 py-8 position-sticky top-0">
       <a href="/" className="flex items-center justify-center gap-2 text-2xl font-medium
       text-white">
         <ChatbrainLogo className="h-8 relative top-[-2px]" /> chatbrain

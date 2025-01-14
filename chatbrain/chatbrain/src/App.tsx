@@ -1,4 +1,3 @@
-// filepath: /home/joey/Projects/py-scripts/chatbrain/chatbrain/src/App.tsx
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { Home } from './components/pages/home'
 import { Header } from './components/header'
@@ -10,6 +9,9 @@ function App() {
   return (
     <Router>
       <div id="root">
+        <div className="background-container">
+          <div className="gradient" />
+        </div>
         <Header />
         <main>
           <Routes>

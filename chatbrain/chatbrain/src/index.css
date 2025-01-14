@@ -27,7 +27,7 @@
   text-align: center;
   width: 100%; /* Ensure the root takes the full width */
   min-height: 900px;
-  height: 100vh; /* Ensure the root takes the full height */
+  height: fit-content;
 }
 
 a {
@@ -35,12 +35,13 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
 
 body {
-  background-color: #d4d6ff;
+  background-color: black;
   margin: 0;
   display: flex;
   place-items: center;
@@ -138,14 +139,5 @@ button:focus-visible {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
