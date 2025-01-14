@@ -17,7 +17,7 @@ function Footer() {
                     href="https://github.com/joeyzone/chatbrain"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground hover:underline transition-all"
+                    className="text-foreground hover:underline transition-all text-slate-300"
                 >
                     chatbrain 
                 </a>
