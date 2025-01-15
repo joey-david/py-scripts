@@ -9,15 +9,12 @@ from typing import Optional, Dict, Any
 
 
 # TODO: test after switch to n users
-def metadata_analysis(filepath, n_users, users, nicknames):
-  with open(filepath, "r", encoding="utf-8") as f:
-    messages = f.readlines()
-
+def metadata_analysis(compressed_string, n_users, usersnames, nicknames):
+  messages = compressed_string.split("\n")
   # Prepare stats dict
   stats = {}
   for i in range(n_users):
-    stats[nicknames[i]] = {
-      "display_name": users[i],
+    stats[usersnames[i]] = {
       "messages": 0,
       "characters": 0
     }
@@ -77,10 +74,11 @@ def get_user_input(prompt):
 if __name__ == "__main__":
 
     # Your existing main code continues...
-    file_path = "data/shrink_test_output.txt"
+    with open(".data/martin_shrinked.txt", "r", encoding="utf-8") as fin:
+        compressed_string = fin.read()
     
     logging.info("📊 Starting metadata analysis...")
-    metadata = metadata_analysis(file_path, 3, ["Joey", "Norma", "Henri"], ["J", "N", "H"])
+    metadata = metadata_analysis(compressed_string, 2, ["Martin", "Tortoised"], ["M", "N"])
     print("\nMetadata Analysis Results:")
     print(json.dumps(metadata, indent=2))
-    
+  

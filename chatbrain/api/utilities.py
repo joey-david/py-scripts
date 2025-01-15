@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../bac
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../backend/llm'))
 
 from backend import chat_shrinker
+from backend import local_analysis
 from backend.llm import llm_analysis
 
 def getTextAnalysis(input_files, start_date, end_date, start_time, end_time):
@@ -32,5 +33,5 @@ def getTextMetadata(input_files):
         compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_whatsapp_chat(file)
     else:
         raise Exception("Unsupported platform")
-    metadata = chat_shrinker.metadata_analysis(compressed_string, n_users, user_list, nickname_list)
-    return metadata
+    metadata = local_analysis.metadata_analysis(compressed_string, n_users, user_list, nickname_list)
+    return metadata, msgCount, n_users, user_list, nickname_list

@@ -108,9 +108,11 @@ def shrink_discord_chat(file, start_date=None, end_date=None, start_time=None, e
     for line in messages:
         line_stripped = line.strip()
         match = header_pattern.match(line_stripped)
+        msgCount += 1
+        if msgCount > 1000:
+            raise Exception("Timeframe too wide, too many messages")
         if match:
             # We have a new user/date/time header
-            print(match.groups())
             if match.groups().__len__() == 4:
                 user_raw, date_str, hour_str = match.groups()[0], match.groups()[1], match.groups()[2]
                 current_datetime = parse_datetime(date_str, hour_str)
@@ -122,6 +124,7 @@ def shrink_discord_chat(file, start_date=None, end_date=None, start_time=None, e
                 nickname = create_nickname(user_raw, used_nicknames)
                 name_to_nickname[user_raw] = nickname
                 used_nicknames.add(nickname)
+                current_user = nickname
             else:
                 nickname = name_to_nickname[user_raw]
                 current_user = nickname
@@ -137,29 +140,20 @@ def shrink_discord_chat(file, start_date=None, end_date=None, start_time=None, e
             line_out = ((date_out + " " + hour_out).strip() + " - " if (date_out or hour_out) else "") + f"{current_user}: "
             result.append(line_out)
             lastIsNickname = True
+
         else:
             # # Continuation of the current user's message
-            # if current_user and current_datetime:
-            #     # Filter by start/end range
-            #     if start_datetime and current_datetime < start_datetime:
-            #         continue
-            #     if end_datetime and current_datetime > end_datetime:
-            #         break
-            msgCount += 1
-            if msgCount > 1000:
-                raise Exception("Timeframe too wide, too many messages")
-
             # Append this line to the result
             if lastIsNickname:
                 line_out = f"{line_stripped}"
             else:
-                line_out = f" {current_user}: {line_stripped}"
+                line_out = f"{current_user}: {line_stripped}"
             # No current user/time yet, just store raw
             if lastIsNickname:
                 result[-1] += line_out
                 lastIsNickname = False
             else:
-                result.append(line_stripped)
+                result.append(line_out)
 
     result_str = "\n".join(result)
     if output_file is not None:
@@ -204,9 +198,11 @@ def shrink_whatsapp_chat(file, start_date=None, end_date=None, start_time=None, 
             continue
         if end_datetime and message_datetime > end_datetime:
             break
+
         msgCount += 1
         if msgCount > 1000:
             raise Exception("Timeframe too wide, too many messages")
+        
         pattern = r'^(\d{1,2}/\d{1,2}/\d{2,4}),?\s*(\d{1,2}:\d{1,2}(?:\s?(?:AM|PM))?)?\s*-\s*(.*?):\s*(.*)$'
         match = re.match(pattern, line)
         if not match:
@@ -261,7 +257,8 @@ if __name__ == "__main__":
     print(f"detect_platform: {detect_platform(file)}")
     file, msgCount, n_users, user_list, nickname_list = shrink_discord_chat(
         file, start_date, end_date, start_time, end_time)
-    print(file)
+    with open("./data/martin_shrinked.txt", "w") as f:
+        f.write(file)
     print(f"Messages: {msgCount}")
     print(f"Number of users: {n_users}")
     print(f"Users: {user_list}")
