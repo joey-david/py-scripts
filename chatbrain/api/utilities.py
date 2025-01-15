@@ -10,7 +10,7 @@ from backend import local_analysis
 from backend.llm import llm_analysis
 
 def getTextAnalysis(input_files, start_date, end_date, start_time, end_time):
-    file = input_files.pop()
+    file = input_files[0]
     start_date = "12/28/2024"
     end_date = "12/29/2024"
     start_time = "12:00 AM"
@@ -21,9 +21,11 @@ def getTextAnalysis(input_files, start_date, end_date, start_time, end_time):
     return json, response
 
 def getTextMetadata(input_files):
-    file = input_files.pop()
+    file = input_files[-1]
+    file = file.read().decode("utf-8")
+    print(file)
     compressed_string, msgCount, n_users, user_list, nickname_list = compressFileForPlatform(file)
-    metadata = local_analysis.metadata_analysis(compressed_string, n_users, user_list, nickname_list)
+    metadata = local_analysis.metadata_analysis(compressed_string, user_list, nickname_list)
     print(metadata)
     return metadata
 

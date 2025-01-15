@@ -10,12 +10,19 @@ export function MetadataAnalysis({ files, onComplete }: MetadataAnalysisProps) {
     async function fetchMetadata() {
       try {
         const formData = new FormData()
-        files.forEach(file => formData.append('files', file))
+        files.forEach((file, index) => formData.append('files', file, file.name))
+        
+        // Optional: show all the files content transmitted to the server
 
         const response = await fetch('http://localhost:5000/metadata', {
           method: 'POST',
           body: formData
         })
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.statusText}`)
+        }
+
         const metadata = await response.json()
         onComplete(metadata)
       } catch (error) {
@@ -28,3 +35,5 @@ export function MetadataAnalysis({ files, onComplete }: MetadataAnalysisProps) {
 
   return null
 }
+
+export default MetadataAnalysis

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { validateFiles } from "@/utils/fileValidation"
 import { MetadataAnalysis } from "@/components/metadataAnalysis"
 import { LLMAnalysis } from "@/components/LLMAnalysis"
@@ -6,7 +6,7 @@ import { MetadataResults } from "@/components/metadataResults"
 import { LLMResults } from "@/components/LLMResults"
 import { EmptyState } from "@/components/empty-state"
 import { PhoneCall, Image, Mic } from "lucide-react"
-import { LoadingBar } from "../ui/loadingBar"
+import { LoadingBar } from "@/components/ui/loadingBar"
 
 
 function Analysis() {
