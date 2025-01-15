@@ -8,7 +8,6 @@ import logging
 from typing import Optional, Dict, Any
 
 
-# TODO: test after switch to n users
 def metadata_analysis(compressed_string, n_users, usersnames, nicknames):
   messages = compressed_string.split("\n")
   # Prepare stats dict
@@ -52,6 +51,7 @@ def metadata_analysis(compressed_string, n_users, usersnames, nicknames):
     name = data["display_name"]
 
     results[name] = {
+      "messages": msg_count,
       "percentage_messages": round((msg_count / total_messages) * 100, 2) if total_messages else 0,
       "percentage_characters": round((char_count / total_characters) * 100, 2) if total_characters else 0,
       "average_message_length": round(char_count / msg_count, 2) if msg_count else 0
@@ -59,26 +59,14 @@ def metadata_analysis(compressed_string, n_users, usersnames, nicknames):
 
   return results
 
-def get_file_path():
-  root = tk.Tk()
-  root.withdraw()  # Hide the root window
-  file_path = filedialog.askopenfilename(title="Select the chat file")
-  return file_path
-
-def get_user_input(prompt):
-  root = tk.Tk()
-  root.withdraw()  # Hide the root window
-  user_input = simpledialog.askstring("Input", prompt)
-  return user_input
 
 if __name__ == "__main__":
 
     # Your existing main code continues...
     with open(".data/martin_shrinked.txt", "r", encoding="utf-8") as fin:
-        compressed_string = fin.read()
+      compressed_string = fin.read()
     
     logging.info("📊 Starting metadata analysis...")
     metadata = metadata_analysis(compressed_string, 2, ["Martin", "Tortoised"], ["M", "N"])
     print("\nMetadata Analysis Results:")
     print(json.dumps(metadata, indent=2))
-  

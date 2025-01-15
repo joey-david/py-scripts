@@ -15,23 +15,23 @@ def getTextAnalysis(input_files, start_date, end_date, start_time, end_time):
     end_date = "12/29/2024"
     start_time = "12:00 AM"
     end_time = "11:59 PM"
-    platform = chat_shrinker.detect_platform(file)
-    if (platform == "discord"):
-        compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_discord_chat(file)
-    elif (platform == "whatsapp"):
-        compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_whatsapp_chat(file)
+    compressed_string, msgCount, n_users, user_list, nickname_list = compressFileForPlatform(file)
     json, response = llm_analysis.promptToJSON(prompt=compressed_string, users=user_list, nicknames=nickname_list, maxOutputTokens=2000)
-    print(json)
+    print("LLM analysis complete ✅")
     return json, response
 
 def getTextMetadata(input_files):
     file = input_files.pop()
+    compressed_string, msgCount, n_users, user_list, nickname_list = compressFileForPlatform(file)
+    metadata = local_analysis.metadata_analysis(compressed_string, n_users, user_list, nickname_list)
+    print(metadata)
+    return metadata
+
+def compressFileForPlatform(file):
     platform = chat_shrinker.detect_platform(file)
-    if (platform == "discord"):
-        compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_discord_chat(file)
-    elif (platform == "whatsapp"):
-        compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_whatsapp_chat(file)
+    if platform == "discord":
+        return chat_shrinker.shrink_discord_chat(file)
+    elif platform == "whatsapp":
+        return chat_shrinker.shrink_whatsapp_chat(file)
     else:
         raise Exception("Unsupported platform")
-    metadata = local_analysis.metadata_analysis(compressed_string, n_users, user_list, nickname_list)
-    return metadata, msgCount, n_users, user_list, nickname_list

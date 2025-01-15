@@ -80,7 +80,7 @@ const Card = ({ children, className = "" }: { children: React.ReactNode; classNa
   </div>
 );
 
-export function Results({ data }: { data: ResultsData }) {
+export function LLMResults({ data }: { data: ResultsData }) {
   const { conversation_metrics, users, insights } = data;
 
   return (
@@ -142,4 +142,4 @@ export function Results({ data }: { data: ResultsData }) {
   );
 }
 
-export default Results;
+export default LLMResults;

@@ -1,8 +1,8 @@
 # app.py or main.py
 import os
-from flask import Flask, request, jsonify
-from flask_cors import CORS  # For handling cross-origin requests
+from flask import Flask, request, jsonify, Response, stream_with_context  # For handling cross-origin requests
 import utilities
+from flask_cors import CORS
 # backend imports
 
 app = Flask(__name__)
@@ -10,7 +10,7 @@ CORS(app)  # Enable CORS for all routes
 
 # Basic route
 @app.route('/llm', methods=['POST'])
-def upload_files():
+def get_llm_analysis():
     correctInput, filetype = checkOnReceive(request)
     if not correctInput:
         raise "Invalid file upload : checkOnReceive failed"
@@ -43,7 +43,6 @@ def get_metadata_analysis():
     correctInput, fileType = checkOnReceive(request)
     if not correctInput:
         raise "Invalid file upload : checkOnReceive failed"
-    
     if fileType == 'text':
         response = utilities.getTextMetadata(files)
     elif fileType == 'audio':
@@ -51,15 +50,33 @@ def get_metadata_analysis():
     elif fileType == 'image':
         raise NotImplementedError
     return response
-    
 
+@app.route('/analysis-progress', methods=['GET'])
+def progress():
+    def generate():
+        yield "data: {\"status\": \"processing\"}\n\n"
+        yield "data: {\"status\": \"compressing\"}\n\n"
+        yield "data: {\"status\": \"metadata\"}\n\n"
+        yield "data: {\"status\": \"analysis\"}\n\n"
+        yield "data: {\"status\": \"done\"}\n\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'text/event-stream',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        }
+    )
 
 def checkOnReceive(request):
     '''Detects the type of files in the provided list of files from an HTTP POST.'''
     files = request.files.getlist('files')
 
     general_type = files.pop().content_type.split('/')[0]
-    print(f"General type: {general_type}")
 
     for file in files:
         if file.content_type != general_type:
