@@ -11,19 +11,15 @@ CORS(app)  # Enable CORS for all routes
 # Basic route
 @app.route('/llm', methods=['POST'])
 def upload_files():
-    correctInput, _ = checkOnReceive(request)
+    correctInput, filetype = checkOnReceive(request)
     if not correctInput:
         raise "Invalid file upload : checkOnReceive failed"
     
     files = request.files.getlist('files')
     
-    print(request)
-    print(request.form)
-
-    file = files[0]
-    if file.content_type == 'text':
+    if filetype == 'text':
         # process text file
-        response, details = utilities.getTextAnalysis(
+        json, response = utilities.getTextAnalysis(
             files,
             request.form['start_date'], 
             request.form['end_date'], 
@@ -31,13 +27,15 @@ def upload_files():
             request.form['end_time']
         )
         pass
-    elif file.content_type == 'audio':
+    elif filetype == 'audio':
         # process audio file
         raise NotImplementedError
-    elif file.content_type == 'image':
+    elif filetype == 'image':
         # process image file
         raise NotImplementedError
-    return response
+    else :
+        raise Exception("Unsupported file type")
+    return json
 
 @app.route('/metadata', methods=['POST'])
 def get_metadata_analysis():

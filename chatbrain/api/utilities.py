@@ -14,8 +14,11 @@ def getTextAnalysis(input_files, start_date, end_date, start_time, end_time):
     end_date = "12/29/2024"
     start_time = "12:00 AM"
     end_time = "11:59 PM"
-    compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_chat(
-        file, start_date, end_date, start_time, end_time)
+    platform = chat_shrinker.detect_platform(file)
+    if (platform == "discord"):
+        compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_discord_chat(file)
+    elif (platform == "whatsapp"):
+        compressed_string, msgCount, n_users, user_list, nickname_list = chat_shrinker.shrink_whatsapp_chat(file)
     json, response = llm_analysis.promptToJSON(prompt=compressed_string, users=user_list, nicknames=nickname_list, maxOutputTokens=2000)
     print(json)
     return json, response
