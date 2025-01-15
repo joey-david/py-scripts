@@ -23,7 +23,7 @@
   --size: 500px;
   --speed: 20s;
   --easing: cubic-bezier(0.8, 0.2, 0.2, 0.8);
-  --transition-speed: 1s;
+  --transition-speed: 1.2s;
 
   position: absolute;
   width: var(--size);

@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Basic route
-@app.route('/upload', methods=['POST'])
+@app.route('/llm', methods=['POST'])
 def upload_files():
     correctInput, _ = checkOnReceive(request)
     if not correctInput:
@@ -21,9 +21,9 @@ def upload_files():
     print(request.form)
 
     file = files[0]
-    if file.content_type == 'text/plain':
+    if file.content_type == 'text':
         # process text file
-        response, details = utilities.getTextResponse(
+        response, details = utilities.getTextAnalysis(
             files,
             request.form['start_date'], 
             request.form['end_date'], 
@@ -31,20 +31,37 @@ def upload_files():
             request.form['end_time']
         )
         pass
-    elif file.content_type == 'audio/mpeg':
+    elif file.content_type == 'audio':
         # process audio file
         raise NotImplementedError
-    elif file.content_type == 'image/jpeg':
+    elif file.content_type == 'image':
         # process image file
         raise NotImplementedError
-    print(response)
     return response
+
+@app.route('/metadata', methods=['POST'])
+def get_metadata_analysis():
+    files = request.files.getlist('files')
+    correctInput, fileType = checkOnReceive(request)
+    if not correctInput:
+        raise "Invalid file upload : checkOnReceive failed"
+    
+    if fileType == 'text':
+        response = utilities.getTextMetadata(files)
+    elif fileType == 'audio':
+        raise NotImplementedError
+    elif fileType == 'image':
+        raise NotImplementedError
+    return response
+    
+
 
 def checkOnReceive(request):
     '''Detects the type of files in the provided list of files from an HTTP POST.'''
     files = request.files.getlist('files')
 
-    general_type = files.pop().content_type
+    general_type = files.pop().content_type.split('/')[0]
+    print(f"General type: {general_type}")
 
     for file in files:
         if file.content_type != general_type:

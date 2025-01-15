@@ -38,7 +38,7 @@ function Analysis() {
     setSelectedFiles(selectedFiles)
     setFileType(determineFileType(selectedFiles[0]))
     
-    await uploadAndAnalyze(selectedFiles)
+    await getLLMAnalysis(selectedFiles)
   }
 
   // Upload and analyze files
@@ -77,7 +77,7 @@ function Analysis() {
   }
 
 
-  const uploadAndAnalyze = async (files: File[]) => {
+  const getLLMAnalysis = async (files: File[]) => {
     setIsLoading(true)
     
     try {
@@ -101,7 +101,7 @@ function Analysis() {
       formData.append('start_time', currTimeMinusOneHour.toISOString());
       formData.append('end_time', currTime.toISOString());
 
-      const response = await fetch('http://localhost:5000/upload', {
+      const response = await fetch('http://localhost:5000/llm', {
         method: 'POST',
         body: formData
       })

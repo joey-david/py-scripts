@@ -44,24 +44,141 @@ def parse_datetime(date_str, time_str):
         return dt
     return None
 
-def shrink_chat(file, start_date=None, end_date=None, start_time=None, end_time=None, output_file=None):
+def create_nickname(name, used):
+    i = 1
+    while i <= len(name):
+        candidate = name[:i]
+        if candidate not in used:
+            return candidate
+        i += 1
+    idx = 2
+    candidate = name
+    while candidate in used:
+        candidate = f"{name}{idx}"
+        idx += 1
+    return candidate
+
+
+def detect_platform(file):
     """
-    Compacts a chat log file by removing messages outside a specified date and time range.
+    Detects the platform of a chat log file.
+    """
+    if isinstance(file, str):
+        messages = file.splitlines()
+    else:
+        messages = file.read().decode('utf-8').splitlines()
+    if any(re.match(r'^(\d{1,2}/\d{1,2}/\d{2,4}),?\s*(\d{1,2}:\d{1,2}(?:\s?(?:AM|PM))?)?\s*-\s*(.*?):\s*(.*)$', line) for line in messages):
+        return "whatsapp"
+    if any(re.match(r'\S+\s—\s\S+\sat\s\d{1,2}:\d{1,2}\s(AM|PM)', line) for line in messages) or \
+        any(re.match(r'\S+\s—\s\d{1,2}/\d{1,2}/\d{1,2},\s\d{1,2}:\d{1,2}\s(AM|PM)', line) for line in messages):
+        return "discord"
+    return None
+
+def shrink_discord_chat(file, start_date=None, end_date=None, start_time=None, end_time=None, output_file=None):
+    """
+    Compacts a discord log file by removing messages outside a specified date
+    and time range. Also compresses names to nicknames, and filters metadata
+    messages. Each line after a 'header line' belongs to the same user/date/time
+    until the next 'header line'. Detects all user names from the chat and assigns
+    unique nicknames automatically.
+    """
+    last_datetime = None
+    result = []
+    name_to_nickname = {}
+    used_nicknames = set()
+
+    start_datetime = parse_datetime(start_date, start_time)
+    end_datetime = parse_datetime(end_date, end_time)
+
+    if isinstance(file, str):
+        messages = file.splitlines()
+    else:
+        messages = file.read().decode('utf-8').splitlines()
+
+    print(f"lines: {len(messages)}")
+
+    # Regex to detect header lines. Make sure to exclude 'pin' messages.
+    header_pattern = re.compile(r'^(?!.*pin)(.+?)\s+—\s+(\d{1,2}/\d{1,2}/\d{2,4}),?\s*(\d{1,2}:\d{1,2}\s?(?:AM|PM))?$|^(?!.*pin)\S+\s—\s\d{1,2}/\d{1,2}/\d{1,2},\s\d{1,2}:\d{1,2}\s(AM|PM)$')
+
+    lastIsNickname = False
+    current_user = None
+    current_datetime = None
+    msgCount = 0
+
+    for line in messages:
+        line_stripped = line.strip()
+        match = header_pattern.match(line_stripped)
+        if match:
+            # We have a new user/date/time header
+            print(match.groups())
+            if match.groups().__len__() == 4:
+                user_raw, date_str, hour_str = match.groups()[0], match.groups()[1], match.groups()[2]
+                current_datetime = parse_datetime(date_str, hour_str)
+                # # Break if beyond end date/time
+                # if end_datetime and current_datetime and current_datetime > end_datetime:
+                #     break
+                # Assign or reuse nickname
+            if user_raw not in name_to_nickname:
+                nickname = create_nickname(user_raw, used_nicknames)
+                name_to_nickname[user_raw] = nickname
+                used_nicknames.add(nickname)
+            else:
+                nickname = name_to_nickname[user_raw]
+                current_user = nickname
+                # Show date/time if more than 1 hour from last or first time
+            if last_datetime is None or (current_datetime - last_datetime) > timedelta(hours=1):
+                date_out = date_str
+                hour_out = hour_str
+                last_datetime = current_datetime
+            else:
+                date_out = ""
+                hour_out = ""
+                # Just a header line, no actual message content
+            line_out = ((date_out + " " + hour_out).strip() + " - " if (date_out or hour_out) else "") + f"{current_user}: "
+            result.append(line_out)
+            lastIsNickname = True
+        else:
+            # # Continuation of the current user's message
+            # if current_user and current_datetime:
+            #     # Filter by start/end range
+            #     if start_datetime and current_datetime < start_datetime:
+            #         continue
+            #     if end_datetime and current_datetime > end_datetime:
+            #         break
+            msgCount += 1
+            if msgCount > 1000:
+                raise Exception("Timeframe too wide, too many messages")
+
+            # Append this line to the result
+            if lastIsNickname:
+                line_out = f"{line_stripped}"
+            else:
+                line_out = f" {current_user}: {line_stripped}"
+            # No current user/time yet, just store raw
+            if lastIsNickname:
+                result[-1] += line_out
+                lastIsNickname = False
+            else:
+                result.append(line_stripped)
+
+    result_str = "\n".join(result)
+    if output_file is not None:
+        with open(output_file, "w", encoding="utf-8") as fout:
+            fout.write(result_str)
+
+    n_users = len(name_to_nickname)
+    names = list(name_to_nickname.keys())
+    usernames = list(name_to_nickname.values())
+    return result_str, msgCount, n_users, names, usernames
+
+
+
+def shrink_whatsapp_chat(file, start_date=None, end_date=None, start_time=None, end_time=None, output_file=None):
+    """
+    Compacts a whatsapp log file by removing messages outside a specified date and time range.
+    Also compresses names to nicknames, and filters metadatamessages.
     Detects all user names from the chat and assigns unique nicknames automatically.
     """
-    def create_nickname(name, used):
-        i = 1
-        while i <= len(name):
-            candidate = name[:i]
-            if candidate not in used:
-                return candidate
-            i += 1
-        idx = 2
-        candidate = name
-        while candidate in used:
-            candidate = f"{name}{idx}"
-            idx += 1
-        return candidate
 
     last_datetime = None
     result = []
@@ -71,7 +188,10 @@ def shrink_chat(file, start_date=None, end_date=None, start_time=None, end_time=
     start_datetime = parse_datetime(start_date, start_time)
     end_datetime = parse_datetime(end_date, end_time)
 
-    messages = file.read().decode('utf-8').splitlines()
+    if isinstance(file, str):
+        messages = file.splitlines()
+    else:
+        messages = file.read().decode('utf-8').splitlines()
 
     start_index = search_start(messages, start_datetime) if start_datetime else 0
     msgCount = 0
@@ -130,37 +250,19 @@ if __name__ == "__main__":
         root.withdraw()
         return simpledialog.askstring("Input", prompt)
 
-    # Example usage with a file from a POST request
-    # from flask import Flask, request
-
-    # app = Flask(__name__)
-
-    # @app.route('/shrink', methods=['POST'])
-    # def shrink():
-    #     uploaded_file = request.files.get('file')
-    #     if not uploaded_file:
-    #         return "No file uploaded", 400
-    #     start_date = request.form.get('start_date')
-    #     end_date = request.form.get('end_date')
-    #     start_time = request.form.get('start_time')
-    #     end_time = request.form.get('end_time')
-    #     output, count, users, names, nicknames = shrink_chat(
-    #         uploaded_file, start_date, end_date, start_time, end_time)
-    #     return output
-
-    # app.run()
-    
-    # For local testing
-    input_file_path = filedialog.askopenfilename(title="Select the chat file")
-    with open(input_file_path, "rb") as f:
-        start_date = "12/28/2024"
-        end_date = "12/29/2024"
-        start_time = "12:00 AM"
-        end_time = "11:59 PM"
-        output_file = "./data/shrink_test_output.txt"
-        string_test, msgCount, n_users, user_list, nickname_list = shrink_chat(
-            f, start_date, end_date, start_time, end_time, output_file)
-        print(f"Messages: {msgCount}")
-        print(f"Number of users: {n_users}")
-        print(f"Users: {user_list}")
-        print(f"Nicknames: {nickname_list}")
+    start_date = "12/28/2024"
+    end_date = "12/29/2024"
+    start_time = "12:00 AM"
+    end_time = "11:59 PM"
+    # get a file from a path
+    file_path = "./data/martin_discord.txt"
+    with open(file_path, "r") as f:
+        file = f.read()
+    print(f"detect_platform: {detect_platform(file)}")
+    file, msgCount, n_users, user_list, nickname_list = shrink_discord_chat(
+        file, start_date, end_date, start_time, end_time)
+    print(file)
+    print(f"Messages: {msgCount}")
+    print(f"Number of users: {n_users}")
+    print(f"Users: {user_list}")
+    print(f"Nicknames: {nickname_list}")
