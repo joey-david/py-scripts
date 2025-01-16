@@ -65,16 +65,19 @@ def metadata_analysis(compressed_string: str, usernames: List[str], nicknames: L
     }
     
     for nickname in nicknames:
-      data = stats[nickname]
-      msg_count = data["messages"]
-      char_count = data["characters"]
+        data = stats[nickname]
+        msg_count = data["messages"]
+        char_count = data["characters"]
 
-      results[nickname] = {
-        "messages": msg_count,
-        "percentage_messages": round((msg_count / total_messages) * 100, 2) if total_messages else 0,
-        "percentage_characters": round((char_count / total_characters) * 100, 2) if total_characters else 0,
-        "average_message_length": round(char_count / msg_count, 2) if msg_count else 0
-      }
+        # Get the corresponding username for the nickname
+        username = usernames[nicknames.index(nickname)]
+
+        results[username] = {
+            "messages": msg_count,
+            "percentage_messages": round((msg_count / total_messages) * 100, 2) if total_messages else 0,
+            "percentage_characters": round((char_count / total_characters) * 100, 2) if total_characters else 0,
+            "average_message_length": round(char_count / msg_count, 2) if msg_count else 0
+        }
 
     return results
 

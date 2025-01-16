@@ -51,7 +51,8 @@ def getSystemPrompt(users, nicknames):
     }}""" for user in users])
 
   return f"""
-    You are an advanced conversation analyst. Analyze the following chat between:
+    Act as a hyperintelligent psychiatrist capable of infering a complete and radical understanding of people and their characteristics from a simple conversation.
+    Analyze the following chat between:
     {user_details}
 
     Your task is to provide a detailed analysis with the following metrics:
@@ -62,12 +63,19 @@ def getSystemPrompt(users, nicknames):
     - **Intensity Score (out of 100):** Measures the engagement level, such as message frequency and response speed.
 
     2) **User-level metrics (for each user by name):**
-    {user_metrics}
+    - **Assertiveness (out of 100):** Reflects the user's confidence and decisiveness in their messages.
+    - **Positiveness (out of 100):** Indicates the overall positive or negative tone of the user's messages.
+    - **Affection Towards Other (out of 100):** Measures the user's emotional warmth and care towards others.
+    - **Romantic Attraction Towards Other (out of 100):** Reflects the user's romantic interest or attraction towards others.
+    - **Rationality (out of 100):** Indicates the user's logical and analytical thinking in their messages.
+    - **Emotiveness (out of 100):** Measures the user's emotional expressiveness and sensitivity.
+    - **IQ Estimate (out of 100):** assume baseline of 100, adjust based on the user's messages.
     
     3) **Insights:**
-    - An array of at least three insights IN THE SAME LANGUAGE AS THE MESSAGES (if they are predominantly in one message, in english otherwise)
-    of around 50 words each, offering deeper interpretation of the conversation. These should be analysis or inferences that the participants 
-    may not be aware of or may find valuable.
+    - An array of at least three insights IN THE SAME LANGUAGE AS THE MESSAGES. Each around 100 words each,
+    offering advanced obscure inferences/guesses on the users, not summaries of the conversation.
+    Don't worry about possibly being wrong, just go far and precise with your guesses.
+    their full names, not their nicknames.
 
     IMPOSED OUTPUT JSON FORMAT: 
 
@@ -93,10 +101,9 @@ def promptToJSON(prompt, maxOutputTokens, users, nicknames, model_name="deepseek
   if price > 0.001:
     print(f"Warning: This API call will cost ${price:.4f} USD.")
   print(f"Token count: {tokenCount}")
-  print(f"Calculated API call price: ${price:.8f} USD")
 
   # make the API call
-  response = api_call("deepseek-chat", maxOutputTokens, systemPrompt, prompt)
+  response = api_call("deepseek-chat", maxOutputTokens, prompt, systemPrompt)
   if response.choices[0].message.refusal != None:
     print("Model refused to answer for the following reason:")
     print(response.choices[0].message.refusal)
@@ -114,36 +121,28 @@ def promptToJSON(prompt, maxOutputTokens, users, nicknames, model_name="deepseek
   jsonOutput = response.choices[0].message.content
   return jsonOutput, response
 
-def api_call(model, maxOutputTokens=2000, systemPrompt=None, userPrompt=None):
+def api_call(model, maxOutputTokens, userPrompt, systemPrompt=None):
   # TODO: reimplement standard api call
-  # response = client.chat.completions.create(
-  #   model=model,
-  #   messages=[
-  #     {"role": "system", "content": systemPrompt},
-  #     {"role": "user", "content": userPrompt}
-  #   ],
-  #   max_tokens=maxOutputTokens,
-  #   response_format={'type': 'json_object'}
-  # )
-  # # pickle the response object
-  # with open("chat_completion.pkl", "wb") as f:
-  #   pickle.dump(response, f)
+  # print(f"System prompt: {systemPrompt}")
+  # print(f"User prompt: {userPrompt}")
+  response = client.chat.completions.create(
+    model=model,
+    messages=[
+      {"role": "system", "content": systemPrompt},
+      {"role": "user", "content": userPrompt}
+    ],
+    max_tokens=maxOutputTokens,
+    response_format={'type': 'json_object'}
+  )
+  # pickle the response object
+  with open("chat_completion.pkl", "wb") as f:
+    pickle.dump(response, f)
 
   # extract the response object from the pickle file
-  with open("chat_completion.pkl", "rb") as f:
-    response = pickle.load(f)
+  # with open("chat_completion.pkl", "rb") as f:
+  #   response = pickle.load(f)
 
   return (response)
 
-def llm_analysis(file_path: str, users: list, nicknames: list):
-  return None
-
 if __name__ == "__main__":
-  def get_string_from_file(file_path):
-    with open(file_path, 'r') as file:
-      return file.read()
-  jsonOutput, response = promptToJSON(get_string_from_file("./data/shrink_test_output.txt"), 1500, ["Joey", "Norma", "Henri"], ["J", "N", "H"])
-  #save the ChatCompletion object to a file
-  with open("chat_completion.json", "w") as f:
-    f.write(str(response))
-  print(response)
+  print(getSystemPrompt(["Alice", "Bob"], ["A", "B"]))

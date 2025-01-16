@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { validateFiles } from "@/utils/fileValidation"
 import { MetadataAnalysis } from "@/components/metadataAnalysis"
 import { LLMAnalysis } from "@/components/LLMAnalysis"
@@ -10,12 +10,15 @@ import { LoadingBar } from "@/components/ui/loadingBar"
 
 
 function Analysis() {
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [metadataResults, setMetadataResults] = useState(null)
   const [llmResults, setLlmResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [status, setStatus] = useState("")
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [fileType, setFileType] = useState<'txt' | 'img' | 'aud' | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const progressInterval = useRef<NodeJS.Timer>()
 
   const handleUploadClick = () => fileInputRef.current?.click()
 
@@ -29,10 +32,65 @@ function Analysis() {
       if (files[0].name.endsWith(".txt")) setFileType("txt")
       else if (files[0].type.startsWith("image")) setFileType("img")
       else if (files[0].type.startsWith("audio")) setFileType("aud")
+      setProgress(5) // Initialize progress on file selection
+      setIsLoading(true)
     } catch (error) {
       console.error("Validation error:", error)
     }
   }
+
+  // Progress handler
+  useEffect(() => {
+    // Clear any existing interval first
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current)
+    }
+
+    // Set up new interval based on current state
+    if (isLoading) {
+      if (!metadataResults && progress < 30) {
+        progressInterval.current = setInterval(() => {
+          setProgress(prev => {
+            if (prev < 30) return prev + 1
+            clearInterval(progressInterval.current as NodeJS.Timeout)
+            return prev
+          })
+        }, 100)
+      } else if (metadataResults && !llmResults && progress < 95) {
+        progressInterval.current = setInterval(() => {
+          setProgress(prev => {
+            if (prev < 95) return prev + 1
+            clearInterval(progressInterval.current as NodeJS.Timeout)
+            return prev
+          })
+        }, 100)
+      } else if (llmResults) {
+        setProgress(100)
+      }
+    } else {
+      setProgress(0)
+    }
+
+    // Cleanup
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current)
+      }
+    }
+  }, [isLoading, metadataResults, llmResults, progress])
+
+  // Status message handler
+  useEffect(() => {
+    if (!isLoading) {
+      setStatus("")
+    } else if (!metadataResults) {
+      setStatus("Analyzing metadata...")
+    } else if (!llmResults) {
+      setStatus("Running LLM analysis...")
+    } else {
+      setStatus("Analysis complete!")
+    }
+  }, [isLoading, metadataResults, llmResults])
 
   return (
     <main className="p-8 flex flex-col items-center">
@@ -67,7 +125,7 @@ function Analysis() {
 
         {/* Loading Spinner */}
         {isLoading && (
-          <LoadingBar />
+          <LoadingBar progress={progress} status={status} />
         )}
 
         {/* Main LLM results */}

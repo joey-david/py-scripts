@@ -72,7 +72,7 @@ def detect_platform(file):
     if any(re.match(r'\S+\s—\s\S+\sat\s\d{1,2}:\d{1,2}\s(AM|PM)', line) for line in messages) or \
         any(re.match(r'\S+\s—\s\d{1,2}/\d{1,2}/\d{1,2},\s\d{1,2}:\d{1,2}\s(AM|PM)', line) for line in messages):
         return "discord"
-    return None
+    return "wrong"
 
 def shrink_discord_chat(file, start_date=None, end_date=None, start_time=None, end_time=None, output_file=None):
     """

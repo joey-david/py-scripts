@@ -12,8 +12,6 @@ export function MetadataAnalysis({ files, onComplete }: MetadataAnalysisProps) {
         const formData = new FormData()
         files.forEach((file, index) => formData.append('files', file, file.name))
         
-        // Optional: show all the files content transmitted to the server
-
         const response = await fetch('http://localhost:5000/metadata', {
           method: 'POST',
           body: formData
@@ -35,5 +33,3 @@ export function MetadataAnalysis({ files, onComplete }: MetadataAnalysisProps) {
 
   return null
 }
-
-export default MetadataAnalysis
