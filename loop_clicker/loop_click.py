@@ -173,6 +173,7 @@ def click_zones_in_order(driver, image_paths, coordinates_map, pause=1.0, thresh
         else:
             return None
     
+    failCount = 0
     while True:
         for path in image_paths:
             # Take screenshot
@@ -182,6 +183,7 @@ def click_zones_in_order(driver, image_paths, coordinates_map, pause=1.0, thresh
             match = find_image_on_screen(path, screenshot)
             
             if match:
+                failCount = 0
                 x, y, confidence = match
                 print(f"Found '{os.path.basename(path)}' with confidence: {confidence:.2f}")
                 
@@ -194,17 +196,10 @@ def click_zones_in_order(driver, image_paths, coordinates_map, pause=1.0, thresh
                 action.perform()
                 action.reset_actions()  # Reset for next action
             else:
-                # Fallback to coordinates map if available
-                coords = coordinates_map.get(path)
-                if coords:
-                    print(f"Using fallback coordinates for '{os.path.basename(path)}'")
-                    x, y = coords
-                    action = ActionChains(driver)
-                    action.move_to_element_with_offset(driver.find_element(By.TAG_NAME, "body"), x, y)
-                    action.click()
-                    action.perform()
-                else:
-                    print(f"[WARN] Could not find '{os.path.basename(path)}' - skipping click")
+                failCount += 1
+                if failCount > 2*len(image_paths):
+                    print("Failed to find images twice. Exiting.")
+                    return
             
             time.sleep(pause)
 
@@ -251,10 +246,10 @@ def main():
         coordinates_map[img] = (x_offset, base_y_offset + i*50)
 
     # Step 4: Click in order
-    click_zones_in_order(driver, selected_images, coordinates_map, pause=5.0)
+    click_zones_in_order(driver, selected_images, coordinates_map, pause=2.5)
 
     # Keep browser open a bit
-    time.sleep(5)
+    time.sleep(2)
     driver.quit()
 
     # Cleanup
