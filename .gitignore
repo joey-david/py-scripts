@@ -1,7 +1,0 @@
-**/.venv/
-**/venv/
-**/.env
-chatbrain/data/*
-**/*.pyc
-**/todo.txt
-**/node_modules/
