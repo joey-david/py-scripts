@@ -2,6 +2,8 @@ import PyPDF2
 import sys
 import os
 import time
+import tkinter as tk
+from tkinter import filedialog
 
 def append_pdf(input_pdf_path, output_pdf_path):
     # Create a PDF file reader object for the input PDF
@@ -26,7 +28,17 @@ def append_pdf(input_pdf_path, output_pdf_path):
 
 def main():
     directory_to_watch = "."
-    specific_pdf_path = "/home/joey/Documents/internship-applications/supporting-documents/sopra-report-en.pdf"
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+
+    specific_pdf_path = filedialog.askopenfilename(
+        title="Select the report PDF",
+        filetypes=[("PDF files", "*.pdf")]
+    )
+
+    if not specific_pdf_path:
+        print("No file selected. Exiting.")
+        sys.exit(1)
     already_seen_files = set(os.listdir(directory_to_watch))
 
     while True:
